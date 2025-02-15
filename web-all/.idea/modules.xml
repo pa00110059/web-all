@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/demo1-web01/demo01-web01.iml" filepath="$PROJECT_DIR$/demo1-web01/demo01-web01.iml" />
       <module fileurl="file://$PROJECT_DIR$/demo02-servlet01/demo02-servlet01.iml" filepath="$PROJECT_DIR$/demo02-servlet01/demo02-servlet01.iml" />
       <module fileurl="file://$PROJECT_DIR$/demo04-forward-redirect/demo04-forward-redirect.iml" filepath="$PROJECT_DIR$/demo04-forward-redirect/demo04-forward-redirect.iml" />
       <module fileurl="file://$PROJECT_DIR$/schedule-system/schedule_system.iml" filepath="$PROJECT_DIR$/schedule-system/schedule_system.iml" />

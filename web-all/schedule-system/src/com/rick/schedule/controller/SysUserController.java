@@ -9,6 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 
@@ -41,6 +42,11 @@ public class SysUserController extends BaseController {
            //跳轉到密碼有誤提示頁
                 resp.sendRedirect("/loginUsernameError.html");
         }else {
+            //登錄成功之後,將登錄的用戶信息放入session
+           HttpSession session = req.getSession();
+           session.setAttribute("sysUser", loginUser);
+
+
            //4 跳轉到首頁
            resp.sendRedirect("/showSchedule.html");
        }
