@@ -1,152 +1,194 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <title>Title</title>
-        <style>
-            .ht {
-                text-align: center;
-                color: cadetblue;
-                font-family: 幼圆;
-            }
-            .tab {
-                width: 500px;
-                border: 5px solid cadetblue;
-                margin: 0px auto;
-                border-radius: 5px;
-                font-family: 幼圆;
-            }
-            .ltr td {
-                border: 1px solid powderblue;
-            }
-            .ipt {
-                border: 0px;
-                width: 50%;
-            }
-            .btn1 {
-                border: 2px solid powderblue;
-                border-radius: 4px;
-                width: 60px;
-                background-color: antiquewhite;
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <style>
+        .ht {
+            text-align: center;
+            color: cadetblue;
+            font-family: 幼圆;
+        }
+
+        .tab {
+            width: 500px;
+            border: 5px solid cadetblue;
+            margin: 0px auto;
+            border-radius: 5px;
+            font-family: 幼圆;
+        }
+
+        .ltr td {
+            border: 1px solid powderblue;
+        }
+
+        .ipt {
+            border: 0px;
+            width: 50%;
+        }
+
+        .btn1 {
+            border: 2px solid powderblue;
+            border-radius: 4px;
+            width: 60px;
+            background-color: antiquewhite;
+        }
+
+        .msg {
+            color: rgb(211, 62, 17);
+        }
+
+        .buttonContainer {
+            text-align: center;
+        }
+    </style>
+
+    <script>
+        function checkUsername() {
+            var usernameReg = /^[a-zA-Z0-9]{5,10}$/;
+            var usernameInput = document.getElementById("usernameInput");
+            var username = usernameInput.value;
+            var usernameMsg = document.getElementById("usernameMsg");
+            if (!usernameReg.test(username)) {
+                usernameMsg.innerText = "格式有誤";
+                return false;
             }
 
-            .msg {
-                color: rgb(211, 62, 17);
-            }
+            /*   潛在的問題
+                 1   回應亂碼問題
+                 2   回應信息格式不規範，處理方式不規範
+                         後端回應的信息應該要有統一格式,前後端共同遵守
+                         回應一個JSON串
+                         {
+                             "code":"100/200/300/400/401",      業務狀態碼   本次請求的業務是否成功?    如果失敗了是什麼原因? 此處不是回應報文中的回應碼
+                             "message":"業務狀態碼的  補充說明/描述"
+                             "data":{}   本次回應的數據     成功/不成功  List<Schedule> ...
+                             ... ...
+                          }
+                 3   檢查不通過，無法阻止表單提交的問題  未來使用VUE axios 結合promise處理
 
-            .buttonContainer {
-                text-align: center;
-            }
-        </style>
+                 解決：創建common資料夾利用JSON統一格式規範
 
-        <script>
-            function checkUsername() {
-                var usernameReg = /^[a-zA-Z0-9]{5,10}$/;
-                var usernameInput = document.getElementById("usernameInput");
-                var username = usernameInput.value;
-                var usernameMsg = document.getElementById("usernameMsg");
-                if (!usernameReg.test(username)) {
-                    usernameMsg.innerText = "格式有誤";
-                    return false;
+
+
+             */
+
+
+            // 格式正確，通過之後，繼續檢查用戶名是否被占用
+            var request = new XMLHttpRequest();
+            //設置回調函數 設置回應回來的信息如何處理
+            request.onreadystatechange = function () {
+                if (request.readyState == 4 && request.status == 200) {
+                    var result = JSON.parse(request.responseText);
+                    if (result.code != 200) {
+                        usernameMsg.innerText = "不可用"
+                    }
                 }
-                usernameMsg.innerText = "OK";
-                return true;
             }
+            //設置請求方式和請求的資源路徑
+            request.open("GET", "/user/checkUsernameUsed?username=" + username)
+            //發送請求
+            request.send()
 
-            function checkUserPwd() {
-                var userPwdReg = /^\d{6}$/;
-                var userPwdInput = document.getElementById("userPwdInput");
-                var userPwd = userPwdInput.value;
-                var userPwdMsg = document.getElementById("userPwdMsg");
-                if (!userPwdReg.test(userPwd)) {
-                    userPwdMsg.innerText = "格式有誤";
-                    return false;
-                }
-                userPwdMsg.innerText = "OK";
-                return true;
+
+            usernameMsg.innerText = "OK";
+            return true;
+        }
+
+        function checkUserPwd() {
+            var userPwdReg = /^\d{6}$/;
+            var userPwdInput = document.getElementById("userPwdInput");
+            var userPwd = userPwdInput.value;
+            var userPwdMsg = document.getElementById("userPwdMsg");
+            if (!userPwdReg.test(userPwd)) {
+                userPwdMsg.innerText = "格式有誤";
+                return false;
             }
+            userPwdMsg.innerText = "OK";
+            return true;
+        }
 
-            function checkReUserPwd() {
-                var userPwdReg = /^\d{6}$/;
-                // 再次输入的密码的格式
-                var reUserPwdInput = document.getElementById("reUserPwdInput");
-                var reUserPwd = reUserPwdInput.value;
-                var reUserPwdMsg = document.getElementById("reUserPwdMsg");
-                if (!userPwdReg.test(reUserPwd)) {
-                    reUserPwdMsg.innerText = "格式有誤";
-                    return false;
-                }
-                // 获得上次密码,对比两次密码是否一致
-                var userPwdInput = document.getElementById("userPwdInput");
-                var userPwd = userPwdInput.value;
-                if (reUserPwd != userPwd) {
-                    reUserPwdMsg.innerText = "兩次密碼不一致";
-                    return false;
-                }
-                reUserPwdMsg.innerText = "OK";
-                return true;
+        function checkReUserPwd() {
+            var userPwdReg = /^\d{6}$/;
+            // 再次输入的密码的格式
+            var reUserPwdInput = document.getElementById("reUserPwdInput");
+            var reUserPwd = reUserPwdInput.value;
+            var reUserPwdMsg = document.getElementById("reUserPwdMsg");
+            if (!userPwdReg.test(reUserPwd)) {
+                reUserPwdMsg.innerText = "格式有誤";
+                return false;
             }
-
-            function checkForm() {
-                var flag1 = checkUsername();
-                var flag2 = checkUserPwd();
-                var flag3 = checkReUserPwd();
-
-                return flag1 && flag2 && flag3;
+            // 获得上次密码,对比两次密码是否一致
+            var userPwdInput = document.getElementById("userPwdInput");
+            var userPwd = userPwdInput.value;
+            if (reUserPwd != userPwd) {
+                reUserPwdMsg.innerText = "兩次密碼不一致";
+                return false;
             }
-        </script>
-    </head>
-    <body>
-        <h1 class="ht">歡迎使用日程管理系統</h1>
-        <h3 class="ht">請註冊</h3>
-        <form method="post" action="/user/regist" onsubmit="return checkForm()">
-            <table class="tab" cellspacing="0px">
-                <tr class="ltr">
-                    <td>請輸入帳號</td>
-                    <td>
-                        <input
-                            class="ipt"
-                            id="usernameInput"
-                            type="text"
-                            name="username"
-                            onblur="checkUsername()"
-                        />
-                        <span id="usernameMsg" class="msg"></span>
-                    </td>
-                </tr>
-                <tr class="ltr">
-                    <td>請輸入密碼</td>
-                    <td>
-                        <input
-                            class="ipt"
-                            id="userPwdInput"
-                            type="password"
-                            name="userPwd"
-                            onblur="checkUserPwd()"
-                        />
-                        <span id="userPwdMsg" class="msg"></span>
-                    </td>
-                </tr>
-                <tr class="ltr">
-                    <td>確認密碼</td>
-                    <td>
-                        <input
-                            class="ipt"
-                            id="reUserPwdInput"
-                            type="password"
-                            onblur="checkReUserPwd()"
-                        />
-                        <span id="reUserPwdMsg" class="msg"></span>
-                    </td>
-                </tr>
-                <tr class="ltr">
-                    <td colspan="2" class="buttonContainer">
-                        <input class="btn1" type="submit" value="註冊" />
-                        <input class="btn1" type="reset" value="重置" />
-                        <button class="btn1"><a href="login.html">去登錄</a></button>
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </body>
+            reUserPwdMsg.innerText = "OK";
+            return true;
+        }
+
+        function checkForm() {
+            var flag1 = checkUsername();
+            var flag2 = checkUserPwd();
+            var flag3 = checkReUserPwd();
+
+            return flag1 && flag2 && flag3;
+        }
+    </script>
+</head>
+<body>
+<h1 class="ht">歡迎使用日程管理系統</h1>
+<h3 class="ht">請註冊</h3>
+<form method="post" action="/user/regist" onsubmit="return checkForm()">
+    <table class="tab" cellspacing="0px">
+        <tr class="ltr">
+            <td>請輸入帳號</td>
+            <td>
+                <input
+                        class="ipt"
+                        id="usernameInput"
+                        type="text"
+                        name="username"
+                        onblur="checkUsername()"
+                />
+                <span id="usernameMsg" class="msg"></span>
+            </td>
+        </tr>
+        <tr class="ltr">
+            <td>請輸入密碼</td>
+            <td>
+                <input
+                        class="ipt"
+                        id="userPwdInput"
+                        type="password"
+                        name="userPwd"
+                        onblur="checkUserPwd()"
+                />
+                <span id="userPwdMsg" class="msg"></span>
+            </td>
+        </tr>
+        <tr class="ltr">
+            <td>確認密碼</td>
+            <td>
+                <input
+                        class="ipt"
+                        id="reUserPwdInput"
+                        type="password"
+                        onblur="checkReUserPwd()"
+                />
+                <span id="reUserPwdMsg" class="msg"></span>
+            </td>
+        </tr>
+        <tr class="ltr">
+            <td colspan="2" class="buttonContainer">
+                <input class="btn1" type="submit" value="註冊"/>
+                <input class="btn1" type="reset" value="重置"/>
+                <button class="btn1"><a href="login.html">去登錄</a></button>
+            </td>
+        </tr>
+    </table>
+</form>
+</body>
 </html>
